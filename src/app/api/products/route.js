@@ -13,7 +13,7 @@ export async function GET(req) {
         return NextResponse.json({ product });
   
       } else {
-        const products = await Product.find();
+        const products = await Product.find({}, null, {sort: {"_id": -1}, limit: 10});
         return NextResponse.json({ products });
       }
   
