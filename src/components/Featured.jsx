@@ -1,10 +1,12 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import getFeaturedProduct from "@/lib/getFeaturedProduct";
+import { CartContext } from "./CartContext";
 
 export default function Featured() {
-const [featuredProduct, setFeaturedProduct] = useState({});
-const [imageSrc, setImageSrc] = useState("");
+    const [featuredProduct, setFeaturedProduct] = useState({});
+    const [imageSrc, setImageSrc] = useState("");
+    const { addProduct } = useContext(CartContext);
 
     /* Featured Product Data */
     const featuredProductId = "65e0e41de24fe35cc0b6dc08";
@@ -17,7 +19,12 @@ const [imageSrc, setImageSrc] = useState("");
         fetchFeaturedProduct();
     }, []);
 
-//console.log(featuredProduct);
+
+    function addFeaturedToCart() {
+        addProduct(featuredProduct._id);
+    }
+
+    //console.log(featuredProduct);
     return (
         /* Grid divide */
         <div className="grid grid-cols-1  md:grid-cols-[50%_50%]">
@@ -32,7 +39,7 @@ const [imageSrc, setImageSrc] = useState("");
                 {/* Buttons */}
                 <div className="flex flex-col space-y-3 items-center mt-2 mr-6">
                     <button className="text-blue-500 hover:underline">Learn more</button>
-                    <button className="bg-blue-500 hover:bg-blue-400 text-white rounded-3xl p-2">Add to cart</button>
+                    <button onClick={addFeaturedToCart} className="bg-blue-500 hover:bg-blue-400 text-white rounded-3xl p-2">Add to cart</button>
                 </div>
             </div>
             {/* Image Section */}

@@ -1,9 +1,14 @@
+import { CartContextProvider } from "@/components/CartContext";
 import "./globals.css";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-gray-200">{children}</body>
+      <body className="bg-gray-200">
+        <CartContextProvider>
+        {children}
+        </CartContextProvider>
+        </body>
     </html>
   );
 }
