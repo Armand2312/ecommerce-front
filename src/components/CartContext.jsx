@@ -12,7 +12,7 @@ export function CartContextProvider({ children }) {
 
     function deleteProduct(productId) {
         setCartProducts(prev => prev.filter((item) => item != productId));
-        console.log(productId)
+        //console.log(productId)
     }
 
     function addProduct(productId) {

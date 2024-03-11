@@ -36,7 +36,7 @@ export default function NewProducts() {
                 /* Product cards */
                 <>
                     <h1 className="ml-[50px] font-semibold text-2xl">New Arrivals</h1>
-                    <div className="md:grid md:grid-cols-3 lg:grid-cols-4 flex flex-col space-y-4 md:space-y-0 md:space-x-8 md:ml-[50px] md:mr-[50px] mt-[25px] mb-[50px]">
+                    <div className="md:grid md:grid-cols-3 xl:grid-cols-4 flex flex-col space-y-4 md:space-y-0 md:space-x-8 md:ml-[50px] md:mr-[50px] mt-[25px] mb-[50px]">
                         {products.length > 0 && products.map((product, index) => (
                             <div key={index}>
                                 <ProductCard product={product} />

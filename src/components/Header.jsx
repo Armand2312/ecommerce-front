@@ -10,7 +10,7 @@ export default function Header() {
     //console.log(cartProducts);
 
     return (
-        <header className="flex bg-gray-800 top-0 sticky p-4 pl-6 pr-6 justify-between w-full z-10">
+        <header className="md:flex hidden bg-gray-800 top-0 sticky p-4 pl-6 pr-6 justify-between w-full z-10">
             <Link className="text-white" href={"/"} scroll={false}>Ecommerce</Link>
             <nav className="flex justify-between w-1/2 text-gray-400">
                 <Link className="hover:text-gray-200" href={"/"} scroll={false}>Home</Link>
