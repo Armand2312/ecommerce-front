@@ -34,7 +34,7 @@ export default function CartIndividualProducts({ product, quantity }) {
                         ))}
                     </select>
                     <div className="font-thin">
-                        £{product.price}
+                        £{product.price * quantity}
                     </div>
                 </div>
 
