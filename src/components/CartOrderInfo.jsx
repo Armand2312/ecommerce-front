@@ -1,9 +1,11 @@
 "use client"
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { InfoIcon } from "../../public/Icons";
 import { CartContext } from "./CartContext";
 import axios from "axios";
 import * as Yup from "yup";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function CartOrderInfo() {
     const { cartProducts } = useContext(CartContext);
@@ -14,7 +16,9 @@ export default function CartOrderInfo() {
     const [postCode, setPostCode] = useState("");
     const [address, setAddress] = useState("");
     const [country, setCountry] = useState("");
+    const router = useRouter();
 
+    /* Validation Schema */
     const validationSchema = Yup.object().shape({
         fullname: Yup.string().required("Enter your full name."),
         email: Yup.string().email().required("Email is required"),
@@ -26,6 +30,7 @@ export default function CartOrderInfo() {
 
     });
 
+    /* Submit Form */
     const submitForm = async (ev) => {
         ev.preventDefault();
         const data = {
@@ -40,11 +45,35 @@ export default function CartOrderInfo() {
         }
         axios.post("/api/checkout", data).then(response => {
             console.log(response);
+            if (response?.data.url) {
+                console.log(response.data.url);
+                router.push(response.data.url);
+            }
         })
     }
 
+
+    /* Payment Success Message */
+    useEffect(() => {
+        if (window.location.href.includes("success")) {
+            toast.success("Payment successful, order placed.",
+                {
+                    position: "top-right",
+                    autoClose: false,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                })
+        }
+    }, [])
+
+
     return (
         <>
+            {/* Hide on empty cart */}
             {!cartProducts.length ? (
                 <></>
             ) : (
@@ -93,8 +122,6 @@ export default function CartOrderInfo() {
                             <label className="flex flex-col">Country
                                 <input name="country" value={country} onChange={ev => setCountry(ev.target.value)} className="border border-gray-400 rounded-md p-1" placeholder="Country" autoComplete="address-level1"></input>
                             </label>
-
-                            <input name="cartProducts" type="hidden" value={cartProducts.join(",")}></input>
 
                             {/* Submit */}
                             <button type="submit" className="bg-black hover:bg-gray-800 p-1 text-white w-full rounded-md">Continue to payment</button>
