@@ -16,13 +16,15 @@ export default function CartProducts() {
         if (cartProducts?.length > 0) {
             axios.post("/api/cart", { productIds: cartProducts }).then(response => {
                 setProducts(response.data.products);
-               
-                //console.log(response.data.products)
-            }) 
+                
+                if (response?.data) {
+                    setLoading(false);
+                }
+            })
         }
-        setLoading(false);
+        
     }, [cartProducts])
-    console.log(cartProducts)
+    //console.log(cartProducts)
 
     return (
         <div className="bg-white rounded-md p-2 space-y-2 flex flex-col">
@@ -31,7 +33,7 @@ export default function CartProducts() {
                 <h1 className="ml-2 font-semibold text-xl">Cart</h1>
             </div>
             {loading ? (
-                <div className="h-24 flex items-center justify-center w-full">
+                <div className="h-full flex items-center justify-center w-full">
                     <Spinner />
                 </div>
             ) : (!cartProducts.length ? (
@@ -39,7 +41,6 @@ export default function CartProducts() {
             ) : (
                 products.length > 0 && (
                     <>
-
                         {products.map((product, index) => (
                             <div key={index}>
                                 <CartIndividualProducts product={product} quantity={cartProducts.filter(id => id === product._id).length} />
@@ -47,10 +48,7 @@ export default function CartProducts() {
                             </div>
                         ))}
                     </>
-                )
-
-            )
-            )}
+                )))}
         </div>
     )
 }
