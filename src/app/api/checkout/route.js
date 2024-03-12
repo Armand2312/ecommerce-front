@@ -12,7 +12,7 @@ export async function POST(req) {
     const productInfo = await Product.find({ _id: uniqueIds })
 
     //console.log({ productInfo })
-    let line_items = []
+    const line_items = []
     for (const productId of uniqueIds) {
         const info = productInfo.find(p => p._id.toString() === productId);
         const quantity = productIds.filter(id => id === productId)?.length || 0;
@@ -27,10 +27,10 @@ export async function POST(req) {
                 },
             })
             
-            //console.log({test: line_items.currency})
+            
         }
     }
-
+//console.log({line_items})
     const orderDoc = await Order.create({ line_items, fullname, email, phoneNumber, city, postCode, address, country, paid: false });
 
     const session = await stripe.checkout.sessions.create({
@@ -42,7 +42,7 @@ export async function POST(req) {
         metadata: { orderId: orderDoc._id.toString() }
     })
     
-    //console.log(session);
+    //console.log(orderDoc);
 
     return NextResponse.json({url: session.url })
 }

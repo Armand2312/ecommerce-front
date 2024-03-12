@@ -4,6 +4,7 @@ import getFeaturedProduct from "@/lib/getFeaturedProduct";
 import { CartContext } from "./CartContext";
 import { CartIcon } from "../../public/Icons";
 import Spinner from "./Spinner";
+import { toast } from "react-toastify";
 
 export default function Featured() {
     const [featuredProduct, setFeaturedProduct] = useState({});
@@ -29,6 +30,17 @@ export default function Featured() {
 
     function addFeaturedToCart() {
         addProduct(featuredProduct._id);
+        toast.success("Product added to cart.",
+            {
+                position: "top-right",
+                autoClose: true,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            })
     }
 
 

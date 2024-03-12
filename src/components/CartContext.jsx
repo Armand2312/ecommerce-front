@@ -15,6 +15,12 @@ export function CartContextProvider({ children }) {
         //console.log(productId)
     }
 
+    function emptyCart() {
+        //setCartProducts([]);
+        ls.removeItem("cart");
+        console.log("cart emptied")
+    }
+
     function addProduct(productId) {
         setCartProducts(prev => [...prev, productId]);
     }
@@ -44,7 +50,7 @@ export function CartContextProvider({ children }) {
     }, [])
 
     return (
-        <CartContext.Provider value={{ cartProducts, setCartProducts, addProduct, deleteProduct, setQuantity }}>
+        <CartContext.Provider value={{ cartProducts, setCartProducts, addProduct, deleteProduct, setQuantity, emptyCart }}>
             {children}
         </CartContext.Provider>
     )
