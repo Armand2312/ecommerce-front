@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import Spinner from "./Spinner";
 
-export default function NewProducts() {
+export default function AllProducts() {
     const [products, setProducts] = useState({});
     const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export default function NewProducts() {
 
     return (
         <div className="h-full w-full relative">
-
+            
             {/* Loading state */}
             {loading ? (
                 <>

@@ -5,11 +5,8 @@ export const CartContext = createContext({});
 
 export function CartContextProvider({ children }) {
     const ls = typeof window !== "undefined" ? window.localStorage : null;
-    //const defaultProducts = ls ? JSON.parse(ls?.getItem("cart")) : [];
-
     const [cartProducts, setCartProducts] = useState([]);
     
-
     function deleteProduct(productId) {
         setCartProducts(prev => prev.filter((item) => item != productId));
         //console.log(productId)
@@ -18,7 +15,7 @@ export function CartContextProvider({ children }) {
     function emptyCart() {
         //setCartProducts([]);
         ls.removeItem("cart");
-        console.log("cart emptied")
+        //console.log("cart emptied")
     }
 
     function addProduct(productId) {
@@ -35,9 +32,7 @@ export function CartContextProvider({ children }) {
         }
     }
 
-
     useEffect(() => {
-
         if (cartProducts?.length > 0) {
             ls?.setItem("cart", JSON.stringify(cartProducts));
         }
