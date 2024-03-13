@@ -6,7 +6,6 @@ import Spinner from "./Spinner";
 
 export default function NewProducts() {
     const [products, setProducts] = useState({});
-    const [imageSrc, setImageSrc] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

@@ -21,7 +21,7 @@ export default function CartProducts() {
         setLoading(false);
         
     }, [cartProducts])
-    console.log(cartProducts)
+    //console.log(cartProducts)
 
     return (
         <div className="bg-white rounded-md p-2 md:min-w-[300px] w-full space-y-2 flex flex-col">

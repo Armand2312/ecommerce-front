@@ -43,8 +43,6 @@ export default function CartOrderInfo() {
 
     /* Submit Form */
     const submitForm = async (values) => {
-        /* ev.preventDefault(); */
-        console.log(values);
         const data = {
             fullname: values.fullname,
             email: values.email,
@@ -58,7 +56,7 @@ export default function CartOrderInfo() {
         axios.post("/api/checkout", data).then(response => {
             console.log(response);
             if (response?.data.url) {
-                console.log(response.data.url);
+                //console.log(response.data.url);
                 router.push(response.data.url);
             }
         })

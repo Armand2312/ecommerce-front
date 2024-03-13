@@ -2,7 +2,8 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { Order } from "@/models/Order";
 import { Product } from "@/models/Product";
 import { NextResponse } from "next/server";
-const stripe = require("stripe")(process.env.STRIPE_SK)
+
+const stripe = require("stripe")(process.env.STRIPE_SK);
 
 export async function POST(req) {
     await mongooseConnect();
@@ -11,7 +12,6 @@ export async function POST(req) {
     const uniqueIds = [... new Set(productIds)];
     const productInfo = await Product.find({ _id: uniqueIds })
 
-    //console.log({ productInfo })
     const line_items = []
     for (const productId of uniqueIds) {
         const info = productInfo.find(p => p._id.toString() === productId);
@@ -25,12 +25,10 @@ export async function POST(req) {
                     product_data: { name: info.title },
                     unit_amount: quantity * info.price * 100,
                 },
-            })
-            
-            
+            })       
         }
     }
-//console.log({line_items})
+
     const orderDoc = await Order.create({ line_items, fullname, email, phoneNumber, city, postCode, address, country, paid: false });
 
     const session = await stripe.checkout.sessions.create({
@@ -42,7 +40,7 @@ export async function POST(req) {
         metadata: { orderId: orderDoc._id.toString() }
     })
     
-    //console.log(orderDoc);
+    //console.log(session);
 
     return NextResponse.json({url: session.url })
 }
