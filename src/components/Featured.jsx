@@ -5,6 +5,7 @@ import { CartContext } from "./CartContext";
 import { CartIcon } from "../../public/Icons";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function Featured() {
     const [featuredProduct, setFeaturedProduct] = useState({});
@@ -66,7 +67,7 @@ export default function Featured() {
 
                         {/* Buttons */}
                         <div className="flex flex-col space-y-3 items-center mt-2 mr-6">
-                            <button className="text-blue-500 hover:underline">Learn more</button>
+                            <Link href={"/products/" + featuredProductId} className="text-blue-500 hover:underline">Learn more</Link>
                             <button onClick={addFeaturedToCart} className="bg-blue-500 hover:bg-blue-400 text-white rounded-3xl p-2 flex items-center gap-1 text-center">Add to cart
                                 <CartIcon sizes={15} color={"white"} />
                             </button>
