@@ -22,11 +22,11 @@ export default function AllProducts() {
 
     return (
         <div className="h-full w-full relative">
-            
+
             {/* Loading state */}
             {loading ? (
                 <>
-                    <h1 className="ml-[50px] font-semibold text-2xl">New Arrivals</h1>
+                    <h1 className="ml-[50px] font-semibold text-2xl">All Products</h1>
                     <div className="flex min-h-[40vh] justify-center items-center">
                         <Spinner />
                     </div>
@@ -34,7 +34,7 @@ export default function AllProducts() {
             ) : (
                 /* Product cards */
                 <>
-                    <h1 className="ml-[50px] font-semibold text-2xl">New Arrivals</h1>
+                    <h1 className="ml-[50px] font-semibold text-2xl">All Products</h1>
                     <div className="md:grid md:grid-cols-3 xl:grid-cols-4 flex flex-col space-y-4 md:space-y-0 md:space-x-8 md:ml-[50px] md:mr-[50px] mt-[25px] mb-[50px]">
                         {products.length > 0 && products.map((product, index) => (
                             <div key={index}>
