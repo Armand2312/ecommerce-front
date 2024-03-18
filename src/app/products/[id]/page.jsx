@@ -1,10 +1,10 @@
 "use client"
-import Header from "@/components/Header";
 import SingleProduct from "@/components/SingleProduct";
 import { useEffect, useState } from "react";
 import { useParams } from 'next/navigation'
 import axios from "axios";
 import Spinner from "@/components/Spinner";
+import NavLayout from "@/components/NavLayout";
 
 export default function ProductPage() {
     const params = useParams();
@@ -20,21 +20,19 @@ export default function ProductPage() {
         })
     }, [id])
 
-    console.log(productInfo)
     return (
-        <>
-            <Header />
-            <div className="p-6 bg-gray-200">
+        <NavLayout>
+            <div className="md:p-6 bg-gray-200">
                 {loading ? (
                     <div className="flex min-h-[70vh] justify-center items-center">
                         <Spinner />
                     </div>
                 ) : (
-                    <div className="p-5 h-full w-full justify-center items-center">
-                        <SingleProduct productInfo={productInfo}/>
+                    <div className="md:p-5 h-full w-full justify-center items-center">
+                        <SingleProduct productInfo={productInfo} />
                     </div>
                 )}
             </div>
-        </>
+        </NavLayout>
     )
 }

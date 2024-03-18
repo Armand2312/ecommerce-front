@@ -34,7 +34,7 @@ export default function ProductCard({ product }) {
                     £{product.price}
                 </div>
                 <div className="space-x-3 bottom-0 flex transition-all">
-                    <Link href={"/products/"+ product._id} className="border border-gray-400 rounded-md p-1 hover:underline">Learn more</Link>
+                    <Link href={"/products/"+ product._id} className="border border-gray-400 rounded-md p-1 hover:underline" scroll={false}>Learn more</Link>
                     <button onClick={() => addToCart(product._id)} className="bg-blue-500 rounded-md p-1 pl-2 pr-2 text-white hover:bg-blue-400">Buy</button>
                 </div>
             </div>
