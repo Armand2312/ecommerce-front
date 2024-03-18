@@ -60,14 +60,14 @@ export default function Featured() {
                     <div className="text-white  md:mt-[100px] md:ml-[50px] lg:ml-[50px]">
                         <div className="space-y-7">
                             <h1 className="font-semibold text-4xl lg:text-6xl">{featuredProduct.title}</h1>
-                            <p className="text-gray-400 line-clamp-5">
+                            <p className="text-gray-400 line-clamp-5 text-justify">
                                 {featuredProduct.description}
                             </p>
                         </div>
 
                         {/* Buttons */}
                         <div className="flex flex-col space-y-3 items-center mt-2 mr-6">
-                            <Link href={"/products/" + featuredProductId} className="text-blue-500 hover:underline">Learn more</Link>
+                            <Link href={"/products/" + featuredProductId} className="text-blue-500 hover:underline" scroll={false}>Learn more</Link>
                             <button onClick={addFeaturedToCart} className="bg-blue-500 hover:bg-blue-400 text-white rounded-3xl p-2 flex items-center gap-1 text-center">Add to cart
                                 <CartIcon sizes={15} color={"white"} />
                             </button>

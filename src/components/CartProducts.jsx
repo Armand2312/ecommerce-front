@@ -13,11 +13,11 @@ export default function CartProducts() {
 
     useEffect(() => {
         setLoading(true);
-        if (cartProducts?.length > 0) {
+        /* if (cartProducts?.length > 0) { */
             axios.post("/api/cart", { productIds: cartProducts }).then(response => {
                 setProducts(response?.data?.products); 
             })
-        }
+        //}
         setLoading(false);
         
     }, [cartProducts])
