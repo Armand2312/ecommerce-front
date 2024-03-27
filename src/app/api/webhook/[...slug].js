@@ -4,10 +4,6 @@ import { NextResponse } from "next/server";
 
 const stripe = require("stripe")(process.env.STRIPE_SK);
 
-export const config = {
-    api: { bodyParser: false, },
-}
-
 export async function POST(req) {
     await mongooseConnect();
     const requestHeaders = new Headers(req.headers);
