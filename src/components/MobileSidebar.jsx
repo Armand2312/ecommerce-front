@@ -28,12 +28,12 @@ export default function MobileSideBar({ show }) {
                     ({cartProducts.length})
                 </Link>
             </div>
-            <div className="mb-[100px]">
+            {/* <div className="mb-[100px]">
                 <Link className={`text-lg flex items-center gap-1 p-2 rounded-3xl pl-5 ${pathname.includes("account") ? "text-white bg-blue-500" : "text-gray-400"}`} href={"/account"} scroll={false}>
                     <AccountIcon sizes={20} color={`${pathname.includes("account") ? "white" : "#9ca3af"}`} />
                     <h2>Account</h2>
                 </Link>
-            </div>
+            </div> */}
         </aside>
     )
 }
