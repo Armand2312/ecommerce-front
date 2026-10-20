@@ -2,10 +2,16 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { Order } from "@/models/Order";
 import { Product } from "@/models/Product";
 import { NextResponse } from "next/server";
-
-const stripe = require("stripe")(process.env.STRIPE_SK);
+import { getTestStripe } from "@/lib/stripe";
 
 export async function POST(req) {
+    let stripe;
+    try {
+        stripe = getTestStripe();
+    } catch (error) {
+        return NextResponse.json({ error: error.message }, { status: 503 });
+    }
+
     await mongooseConnect();
     const { fullname, email, phoneNumber, city, postCode, address, country, cartProducts } = await req.json();
     const productIds = cartProducts.split(",");
