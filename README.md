@@ -46,8 +46,10 @@ allow connections from the deployed application. Only use Stripe test mode and
 test endpoint credentials. Configure service settings manually; this repository
 does not provision or change external services.
 
-Next.js was upgraded from 14 to the patched 15 maintenance line because current
-security fixes are unavailable on 14. React remains on 18 and Tailwind on 3.
+Next.js and `eslint-config-next` are pinned to `15.5.27`. The Windows native
+compiler installed by Next.js is `@next/swc-win32-x64-msvc@15.5.27`.
+React remains on 18 and Tailwind on 3. This version was selected after native
+SWC 15.5.28 was blocked by Windows Smart App Control on the development machine.
 Next.js 15 no longer caches GET route handlers by default; this suits the live
 catalog endpoint. No async server `params` migration is needed because the
 product page reads params through the client-side `useParams` hook.
@@ -55,21 +57,32 @@ product page reads params through the client-side `useParams` hook.
 Targeted npm overrides keep Next's PostCSS on the patched 8.x line and
 Tailwind's selector parser on patched 7.x, avoiding a Tailwind 4 migration.
 The dependency audit currently reports no production vulnerabilities. Seven
-build/lint dependency findings stem from `braces` (GHSA-vfj7-8cjw-p6xm), for
-which no patched version is published. These tools process repository-controlled
-patterns; the storefront does not expose glob-pattern input to visitors. Recheck
-the advisory when updating dependencies rather than applying `npm audit fix
---force`, which proposes unrelated major changes.
+build/lint dependency findings stem from [`braces` (GHSA-vfj7-8cjw-p6xm)](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm),
+for which no patched version is published. The dependency paths are:
 
-Verification on the current Windows machine required a temporary matching
-`@next/swc-wasm-nodejs@15.5.28` compiler because Windows Application Control
-blocked native SWC. It was installed with `--no-save --package-lock=false` and
-selected only for the build process using Next's `NEXT_TEST_WASM_DIR` fallback.
-This local workaround is not part of the project dependencies or Vercel config;
-ordinary local builds require native SWC to be permitted by the machine policy.
-The fallback production build, page-route smoke checks, live-key rejection,
-and a read-only catalog query all passed. Existing lint warnings are deferred
-with the cart and UI work. No checkout session or order was created in testing.
+- `eslint-config-next -> @next/eslint-plugin-next -> fast-glob -> micromatch -> braces`
+- `tailwindcss -> fast-glob -> micromatch -> braces`
+- `tailwindcss -> micromatch -> braces`
+- `tailwindcss -> chokidar -> braces`
+
+The seven findings count the vulnerable package and affected parent packages,
+rather than seven independent vulnerabilities. Crafted, deeply nested glob
+patterns can exhaust the stack. These tools process repository-controlled
+patterns; the storefront does not expose glob-pattern input to visitors.
+There is currently no compatible patched `braces` release to select. No forced
+upgrades or additional overrides were applied. Recheck the advisory when updating
+dependencies rather than applying `npm audit fix --force`, which proposes
+unrelated major changes. A clean production audit is not a guarantee that an
+older framework version includes every upstream security fix; review security
+releases separately before deployment.
+
+Windows development uses native SWC directly: run `npm.cmd run dev` from the
+Windows project directory and open http://localhost:3000. No WSL, WebAssembly
+compiler, or Windows security changes are required for this verified setup.
+Native SWC loading, the development server, homepage, read-only catalog query,
+and production build passed on 15.5.27. Existing lint warnings are deferred with
+the cart and UI work. No checkout session or order was created in testing.
+`debug.log` is ignored and should not be committed.
 
 ## Work deferred to the next phases
 
