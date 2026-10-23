@@ -1,39 +1,28 @@
 "use client"
-import { useContext, useEffect, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { InfoIcon } from "../../public/Icons";
 import { CartContext } from "./CartContext";
 import axios from "axios";
 import * as Yup from "yup";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 
 export default function CartOrderInfo() {
-    const { cartProducts, emptyCart } = useContext(CartContext);
-    const [fullname, setFullName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [city, setCity] = useState("");
-    const [postCode, setPostCode] = useState("");
-    const [address, setAddress] = useState("");
-    const [country, setCountry] = useState("");
-    const router = useRouter();
-
-    const initialValues = {
-        fullname: fullname,
-        email: email,
-        phoneNumber: phoneNumber,
-        city: city,
-        postCode: postCode,
-        address: address,
-        country: country,
-    }
+    const { cartProducts } = useContext(CartContext);
+    const [submitError, setSubmitError] = useState("");
+    const [canRestart, setCanRestart] = useState(false);
+    const submitting = useRef(false);
+    const attempt = useRef(null);
+    const initialValues = { fullname: "", email: "", phoneNumber: "", city: "", postCode: "", address: "", country: "" };
 
     /* Validation Schema */
     const validationSchema = Yup.object().shape({
         fullname: Yup.string().required("Enter your full name."),
         email: Yup.string().email("Enter a valid email address").required("Email is required"),
-        phoneNumber: Yup.number().required("Enter your phone number"),
+        phoneNumber: Yup.string().matches(/^\+?[\d ()-]{5,32}$/, "Enter a valid phone number")
+            .test("phone-digits", "Enter a valid phone number", value => {
+                const digits = (value || "").replace(/\D/g, "").length;
+                return digits >= 5 && digits <= 15;
+            }).required("Enter your phone number"),
         city: Yup.string().required("Enter your city."),
         postCode: Yup.string().required("Enter your postcode."),
         address: Yup.string().required("Enter your full address."),
@@ -41,47 +30,37 @@ export default function CartOrderInfo() {
 
     });
 
-    /* Submit Form */
     const submitForm = async (values) => {
-        const data = {
-            fullname: values.fullname,
-            email: values.email,
-            phoneNumber: values.phoneNumber,
-            city: values.city,
-            postCode: values.postCode,
-            address: values.address,
-            country: values.country,
-            cartProducts: cartProducts.join(",")
+        if (submitting.current) return;
+        submitting.current = true;
+        setSubmitError("");
+        setCanRestart(false);
+        try {
+            const data = { ...values, cartProducts: cartProducts.join(",") };
+            const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(data)));
+            const fingerprint = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("");
+            let saved = attempt.current;
+            try { saved ||= JSON.parse(sessionStorage.getItem("checkoutAttempt") || "null"); } catch { /* Optional persistence. */ }
+            if (!saved || saved.fingerprint !== fingerprint) saved = { id: crypto.randomUUID(), fingerprint };
+            attempt.current = saved;
+            try { sessionStorage.setItem("checkoutAttempt", JSON.stringify(saved)); } catch { /* Keep attempt in memory. */ }
+            const response = await axios.post("/api/checkout", { ...data, attemptId: saved.id });
+            if (!response.data?.url) throw new Error("Missing checkout URL");
+            window.location.assign(response.data.url);
+        } catch (error) {
+            setSubmitError(error.response?.data?.error || "Unable to open payment. Please try again.");
+            setCanRestart(error.response?.status === 409);
+        } finally {
+            submitting.current = false;
         }
-        axios.post("/api/checkout", data).then(response => {
-            console.log(response);
-            if (response?.data.url) {
-                //console.log(response.data.url);
-                router.push(response.data.url);
-            }
-        })
+    };
+
+    function restartAttempt() {
+        attempt.current = null;
+        try { sessionStorage.removeItem("checkoutAttempt"); } catch { /* Optional persistence. */ }
+        setCanRestart(false);
+        setSubmitError("A new checkout attempt is ready. Submit your details again.");
     }
-
-    /* Payment Success Message */
-    useEffect(() => {
-        if (window.location.href.includes("success")) {
-            /* Empty Cart */
-            emptyCart();
-            toast.success("Payment successful, order placed. Check your email for your receipt.",
-                {
-                    position: "top-right",
-                    autoClose: false,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                })
-        }
-    }, [])
-
-
     return (
         <>
             {/* Hide on empty cart */}
@@ -96,7 +75,7 @@ export default function CartOrderInfo() {
 
 
                     <Formik initialValues={initialValues} onSubmit={submitForm} validationSchema={validationSchema}>
-                        {({ errors, touched }) => (
+                        {({ isSubmitting }) => (
                             <Form>
                                 <div className="flex flex-col space-y-2 p-2">
 
@@ -172,7 +151,9 @@ export default function CartOrderInfo() {
                                     </div>
 
                                     {/* Submit */}
-                                    <button type="submit" className="bg-black hover:bg-gray-800 p-1 text-white w-full rounded-md">Continue to payment</button>
+                                    {submitError && <p role="alert" className="text-red-600">{submitError}</p>}
+                                    {canRestart && <button type="button" onClick={restartAttempt} className="underline">Start a new checkout attempt</button>}
+                                    <button type="submit" disabled={isSubmitting || canRestart} className="bg-black hover:bg-gray-800 disabled:opacity-50 p-1 text-white w-full rounded-md">{isSubmitting ? "Opening payment..." : "Continue to payment"}</button>
                                 </div>
                             </Form>
                         )}

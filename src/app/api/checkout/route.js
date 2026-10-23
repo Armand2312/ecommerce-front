@@ -1,52 +1,33 @@
 import { mongooseConnect } from "@/lib/mongoose";
-import { Order } from "@/models/Order";
+import { Order, ensureCheckoutIndex } from "@/models/Order";
 import { Product } from "@/models/Product";
 import { NextResponse } from "next/server";
 import { getTestStripe } from "@/lib/stripe";
+import { CheckoutError, validateCheckout, checkoutOrigin, createCheckout } from "@/lib/checkout.mjs";
+
+export const runtime = "nodejs";
 
 export async function POST(req) {
-    let stripe;
+    const headers = { "Cache-Control": "no-store" };
     try {
-        stripe = getTestStripe();
+        let body;
+        try {
+            if (!req.headers.get("content-type")?.includes("application/json")) throw new Error();
+            const text = await req.text();
+            if (text.length > 65536) throw new Error();
+            body = JSON.parse(text);
+        } catch { throw new CheckoutError(400, "Invalid JSON checkout request."); }
+        const input = validateCheckout(body);
+        const origin = checkoutOrigin(process.env.PUBLIC_URL);
+        let stripe;
+        try { stripe = getTestStripe(); }
+        catch { throw new CheckoutError(503, "Stripe configuration error: a test secret key (sk_test_...) is required. Live payments are disabled."); }
+        await mongooseConnect();
+        await ensureCheckoutIndex();
+        const url = await createCheckout({ input, origin, Order, Product, stripe });
+        return NextResponse.json({ url }, { headers });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 503 });
+        return NextResponse.json({ error: error instanceof CheckoutError ? error.message : "Unable to start checkout. Please retry the same attempt." },
+            { status: error instanceof CheckoutError ? error.status : 503, headers });
     }
-
-    await mongooseConnect();
-    const { fullname, email, phoneNumber, city, postCode, address, country, cartProducts } = await req.json();
-    const productIds = cartProducts.split(",");
-    const uniqueIds = [... new Set(productIds)];
-    const productInfo = await Product.find({ _id: uniqueIds })
-
-    const line_items = []
-    for (const productId of uniqueIds) {
-        const info = productInfo.find(p => p._id.toString() === productId);
-        const quantity = productIds.filter(id => id === productId)?.length || 0;
-
-        if (quantity > 0) {
-            line_items.push({
-                quantity,
-                price_data: {
-                    currency: "GBP",
-                    product_data: { name: info.title },
-                    unit_amount: quantity * info.price * 100,
-                },
-            })       
-        }
-    }
-
-    const orderDoc = await Order.create({ line_items, fullname, email, phoneNumber, city, postCode, address, country, paid: false });
-
-    const session = await stripe.checkout.sessions.create({
-        line_items,
-        mode: "payment",
-        customer_email: email,
-        success_url: process.env.PUBLIC_URL + "/cart?success=1",
-        cancel_url: process.env.PUBLIC_URL + "/cart?cancel=1",
-        metadata: { orderId: orderDoc._id.toString() }
-    })
-    
-    //console.log(session);
-
-    return NextResponse.json({url: session.url })
 }

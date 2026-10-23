@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export function mongooseConnect() {
-    if (mongoose.connection.readState === 1) {
+    if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
         return mongoose.connection.asPromise();
     }
     else {
