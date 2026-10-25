@@ -8,27 +8,34 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 
 export default function Featured() {
-    const [featuredProduct, setFeaturedProduct] = useState({});
-    const [imageSrc, setImageSrc] = useState("");
+    const [featuredProduct, setFeaturedProduct] = useState(null);
+    const [error, setError] = useState("");
+    const [retry, setRetry] = useState(0);
     const [loading, setLoading] = useState(true);
     const { addProduct } = useContext(CartContext);
 
     /* Featured Product Data */
     const featuredProductId = "65e0e41de24fe35cc0b6dc08";
     useEffect(() => {
-        setLoading(true);
-        async function fetchFeaturedProduct() {
-            const response = await getFeaturedProduct(featuredProductId);
-            setFeaturedProduct(response.data.product);
-            setImageSrc(response.data.product.images[0]);
-            if (response.data.product) {
-                setLoading(false)
+        const controller = new AbortController();
+        async function loadFeaturedProduct() {
+            setLoading(true);
+            setError("");
+            setFeaturedProduct(null);
+            try {
+                const product = await getFeaturedProduct(featuredProductId, controller.signal);
+                if (!controller.signal.aborted) setFeaturedProduct(product);
+            } catch (error) {
+                if (!controller.signal.aborted && error.response?.status !== 404) {
+                    setError("Unable to load the featured product. Please try again.");
+                }
+            } finally {
+                if (!controller.signal.aborted) setLoading(false);
             }
         }
-        fetchFeaturedProduct();
-    }, []);
-
-
+        loadFeaturedProduct();
+        return () => controller.abort();
+    }, [retry]);
     function addFeaturedToCart() {
         addProduct(featuredProduct._id);
         toast.success("Product added to cart.",
@@ -45,11 +52,25 @@ export default function Featured() {
     }
 
 
+    if (!loading && error) {
+        return <div role="alert" className="text-white text-center py-12">
+            <p>{error}</p>
+            <button type="button" onClick={() => setRetry(value => value + 1)} className="underline mt-2">Try again</button>
+        </div>;
+    }
+    if (!loading && !featuredProduct) {
+        return <div className="text-white text-center py-12">
+            <h1 className="font-semibold text-3xl">Welcome to our demo store</h1>
+            <p className="mt-2">No featured product is available right now.</p>
+            <Link href="/products" className="underline mt-2 inline-block">Browse products</Link>
+        </div>;
+    }
+
     return (
         <>
             {/* Loading state */}
             {loading ? (
-                <div className="min-h-[100vh] md:min-h-[90vh] flex items-center justify-center">
+                <div role="status" aria-label="Loading featured product" className="min-h-[100vh] md:min-h-[90vh] flex items-center justify-center">
                     <Spinner />
                 </div>
             ) : (
@@ -76,7 +97,7 @@ export default function Featured() {
 
                     {/* Image Section */}
                     <div className="flex w-full justify-center order-first md:order-last items-center ">
-                        <img className="h-[400px]" src={imageSrc}></img>
+                        <img className="h-[400px]" src={featuredProduct.images?.[0]} alt={featuredProduct.title}></img>
                     </div>
                 </div>
             )}

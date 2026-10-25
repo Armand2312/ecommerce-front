@@ -1,10 +1,9 @@
-import axios from 'axios';
-export default async function getFeaturedProduct(featuredProductId) {
-    try {
-        const response = await axios.get("/api/products?id=" + featuredProductId)
-        return response;
+import axios from "axios";
 
-    } catch (error) {
-        console.log(error);
-    }
+export default async function getFeaturedProduct(productId, signal) {
+    const response = await axios.get("/api/products", {
+        params: { id: productId }, signal, timeout: 15000,
+    });
+    if (!response.data.product?._id) throw new Error("Invalid product response.");
+    return response.data.product;
 }

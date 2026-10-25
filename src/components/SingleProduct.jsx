@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 export default function SingleProduct({ productInfo }) {
     const { addProduct } = useContext(CartContext)
     const [readMore, setReadMore] = useState(false);
-    const [activeImage, setActiveImage] = useState(productInfo?.images[0]);
+    const images = productInfo.images || [];
+    const [activeImage, setActiveImage] = useState(images[0]);
 
     function addToCart(product) {
         addProduct(product);
@@ -30,11 +31,13 @@ export default function SingleProduct({ productInfo }) {
 
                 {/* Big Image */}
                 <div className="flex flex-col mt-3 md:mt-0 items-center">
-                    <img className="h-[350px] w-[300px] md:h-[300px] md:w-[400px] md:mt-[40px]" src={activeImage}></img>
+                    {activeImage ? (
+                        <img className="h-[350px] w-[300px] md:h-[300px] md:w-[400px] md:mt-[40px]" src={activeImage} alt={productInfo.title} />
+                    ) : <p className="p-6">No image available</p>}
                     <div className="grid grid-cols-3 mt-5 mb-5 gap-2">
-                        {productInfo.images.map((item, index) => (
+                        {images.map((item, index) => (
                             <button onClick={() => setActiveImage(item)} key={index} className={`border-[2px] flex items-center justify-center rounded-md p-1 ${item === activeImage ? 'border-blue-500' : "border-gray-400"}`}>
-                                <img className="md:h-[50px] h-[100px]" src={item} ></img>
+                                <img className="md:h-[50px] h-[100px]" src={item} alt={`${productInfo.title}, image ${index + 1}`} />
                             </button>
                         ))}
                     </div>
