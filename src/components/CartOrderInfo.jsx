@@ -151,6 +151,12 @@ export default function CartOrderInfo() {
                                     </div>
 
                                     {/* Submit */}
+                                    <aside aria-label="Test checkout instructions" className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">
+                                        <p className="font-semibold">Test checkout only</p>
+                                        <p className="mt-1">Use fictional contact details. Do not enter real card details.</p>
+                                        <p className="mt-2">Test card: <span className="inline-block font-mono font-semibold">4242 4242 4242 4242</span></p>
+                                        <p>Any future expiry date and any 3-digit CVC.</p>
+                                    </aside>
                                     {submitError && <p role="alert" className="text-red-600">{submitError}</p>}
                                     {canRestart && <button type="button" onClick={restartAttempt} className="underline">Start a new checkout attempt</button>}
                                     <button type="submit" disabled={isSubmitting || canRestart} className="bg-black hover:bg-gray-800 disabled:opacity-50 p-1 text-white w-full rounded-md">{isSubmitting ? "Opening payment..." : "Continue to payment"}</button>

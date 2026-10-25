@@ -1,5 +1,5 @@
 "use client";
-import getLatestProducts from "@/lib/getLatestProducts";
+import getAllProducts from "@/lib/getAllProducts";
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import Spinner from "./Spinner";
@@ -16,7 +16,7 @@ export default function AllProducts() {
             setLoading(true);
             setError("");
             try {
-                const products = await getLatestProducts(controller.signal);
+                const products = await getAllProducts(controller.signal);
                 if (!controller.signal.aborted) setProducts(products);
             } catch {
                 if (!controller.signal.aborted) setError("Unable to load products. Please try again.");

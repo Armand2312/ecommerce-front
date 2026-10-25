@@ -18,7 +18,9 @@ export async function GET(req) {
             return NextResponse.json({ product });
         }
 
-        const products = await Product.find({}, null, { sort: { _id: -1 }, limit: 10 });
+        const options = { sort: { _id: -1 } };
+        if (req.nextUrl.searchParams.get("all") !== "true") options.limit = 10;
+        const products = await Product.find({}, null, options);
         return NextResponse.json({ products });
     } catch {
         return NextResponse.json({ error: "Unable to load products. Please try again." }, { status: 500 });
