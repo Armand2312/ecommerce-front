@@ -10,18 +10,35 @@ export default function CartProducts() {
     const { cartProducts } = useContext(CartContext);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        setLoading(true);
-        /* if (cartProducts?.length > 0) { */
-            axios.post("/api/cart", { productIds: cartProducts }).then(response => {
-                setProducts(response?.data?.products); 
-            })
-        //}
-        setLoading(false);
-        
+        if (cartProducts.length === 0) {
+            setProducts([]);
+            setError("");
+            setLoading(false);
+            return;
+        }
+        const controller = new AbortController();
+        async function loadCart() {
+            setLoading(true);
+            setError("");
+            try {
+                const response = await axios.post("/api/cart", { productIds: cartProducts }, {
+                    signal: controller.signal,
+                    timeout: 15000,
+                });
+                if (!Array.isArray(response.data.products)) throw new Error("Invalid cart response.");
+                if (!controller.signal.aborted) setProducts(response.data.products);
+            } catch {
+                if (!controller.signal.aborted) setError("Unable to load your cart. Please refresh to try again.");
+            } finally {
+                if (!controller.signal.aborted) setLoading(false);
+            }
+        }
+        loadCart();
+        return () => controller.abort();
     }, [cartProducts])
-    //console.log(cartProducts)
 
     return (
         <div className="bg-white rounded-md p-2 md:min-w-[300px] w-full space-y-2 flex flex-col">
@@ -33,6 +50,8 @@ export default function CartProducts() {
                 <div className="h-full flex items-center justify-center w-full">
                     <Spinner />
                 </div>
+            ) : error ? (
+                <p role="alert">{error}</p>
             ) : (!cartProducts.length ? (
                 <div>Your cart is empty</div>
             ) : (

@@ -16,7 +16,10 @@ export function CartContextProvider({ children }) {
         setCartProducts(prev => prev.filter(item => item !== productId));
     }
     function addProduct(productId) {
-        setCartProducts(prev => [...prev, productId]);
+        setCartProducts(prev => {
+            if (prev.filter(id => id === productId).length >= 20) return prev;
+            return [...prev, productId];
+        });
     }
     function setQuantity(quantity, productId) {
         const count = Number(quantity);

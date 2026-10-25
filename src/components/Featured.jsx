@@ -12,7 +12,7 @@ export default function Featured() {
     const [error, setError] = useState("");
     const [retry, setRetry] = useState(0);
     const [loading, setLoading] = useState(true);
-    const { addProduct } = useContext(CartContext);
+    const { addProduct, cartProducts } = useContext(CartContext);
 
     /* Featured Product Data */
     const featuredProductId = "65e0e41de24fe35cc0b6dc08";
@@ -37,6 +37,10 @@ export default function Featured() {
         return () => controller.abort();
     }, [retry]);
     function addFeaturedToCart() {
+        if (cartProducts.filter(id => id === featuredProduct._id).length >= 20) {
+            toast.info("You can add a maximum of 20 units per product.");
+            return;
+        }
         addProduct(featuredProduct._id);
         toast.success("Product added to cart.",
             {

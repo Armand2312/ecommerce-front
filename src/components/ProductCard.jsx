@@ -5,10 +5,14 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 
 export default function ProductCard({ product }) {
-    const { addProduct } = useContext(CartContext);
+    const { addProduct, cartProducts } = useContext(CartContext);
 
     /* Add product to cart */
     function addToCart(product) {
+        if (cartProducts.filter(id => id === product).length >= 20) {
+            toast.info("You can add a maximum of 20 units per product.");
+            return;
+        }
         addProduct(product);
         toast.success("Product added to cart.",
             {

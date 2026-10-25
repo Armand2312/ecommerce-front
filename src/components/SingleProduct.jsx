@@ -4,12 +4,16 @@ import { CartContext } from "./CartContext";
 import { toast } from "react-toastify";
 
 export default function SingleProduct({ productInfo }) {
-    const { addProduct } = useContext(CartContext)
+    const { addProduct, cartProducts } = useContext(CartContext)
     const [readMore, setReadMore] = useState(false);
     const images = productInfo.images || [];
     const [activeImage, setActiveImage] = useState(images[0]);
 
     function addToCart(product) {
+        if (cartProducts.filter(id => id === product).length >= 20) {
+            toast.info("You can add a maximum of 20 units per product.");
+            return;
+        }
         addProduct(product);
         toast.success("Product added to cart.",
             {
