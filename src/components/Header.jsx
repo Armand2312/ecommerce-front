@@ -8,7 +8,7 @@ export default function Header({ setShow, show }) {
     const { cartProducts } = useContext(CartContext);
 
     return (
-        <header className="flex bg-gray-800 top-0 sticky p-4 pl-6 pr-6 justify-between w-full z-10">
+        <header className="flex h-14 items-center bg-gray-800 p-4 pl-6 pr-6 justify-between w-full">
             <Link className="text-white" href={"/"} scroll={false}>Ecommerce Demo</Link>
 
             {/* Mobile hamburger button */}

@@ -8,8 +8,10 @@ export default function NavLayout({children}) {
     
     return (
         <div className="min-h-screen">
-        <Header show={show} setShow={setShow}/>
-        <MobileSideBar show={show}/>
+            <div className="sticky top-0 z-20">
+                <Header show={show} setShow={setShow}/>
+                <MobileSideBar show={show}/>
+            </div>
             {children}       
         </div>
     )

@@ -10,7 +10,7 @@ export default function MobileSideBar({ show }) {
     const pathname = usePathname();
 
     return (
-        <aside className={`${show ? "left-0" : "left-full"} flex flex-col justify-between md:hidden fixed w-full transition-all p-6 bg-gray-800 h-screen z-10`}>
+        <aside className={`${show ? "left-0 visible" : "left-full invisible"} top-full absolute flex flex-col justify-between md:hidden w-full transition-all p-6 bg-gray-800 h-[calc(100dvh-3.5rem)] overflow-y-auto`}>
             <div className="flex flex-col space-y-4">
                 <Link className={`text-lg flex items-center gap-1 p-2 rounded-3xl pl-5 ${pathname === "/" ? "text-white bg-blue-500" : "text-gray-400"}`} href={"/"} scroll={false}>
                     <HomeIcon sizes={20} color={`${pathname === "/" ? "white" : "#9ca3af"}`} />
