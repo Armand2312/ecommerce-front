@@ -4,6 +4,8 @@ An e-commerce storefront built with Next.js, React, and MongoDB, featuring produ
 
 This is a demo, not a real business. Payments run in Stripe test mode and no real money is charged.
 
+Live demo link: [text](https://ecommerce-front-one-blond.vercel.app/)
+
 ## What you can do
 
 - Browse the full product catalog and the ten newest arrivals.
